@@ -17,6 +17,8 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   late final List<SudokuElementModel> _sudokuElements;
 
+  int _selectedIndex = 0;
+
   @override
   void initState() {
     super.initState();
@@ -43,19 +45,29 @@ class _HomePageState extends State<HomePage> {
                 child: InkWell(
                   child: SudokuElement(model: _sudokuElements[index]),
                   onTap: () async {
-                    for (int i = 0; i < 81; i++) {
-                      if (isInSameRowColumnBox(index, i)) {
-                        _sudokuElements[i].color = Colors.grey;
-                      } else {
-                        _sudokuElements[i].color = Colors.red;
+                    if (!_sudokuElements[index].readonly) {
+                      for (int i = 0; i < 81; i++) {
+                        if (isInSameRowColumnBox(index, i)) {
+                          _sudokuElements[i].color = _sudokuElements[i].readonly
+                              ? Colors.black54
+                              : _sudokuElements[i].color.withOpacity(0.6);
+                        } else {
+                          _sudokuElements[i].color = _sudokuElements[i].readonly
+                              ? Colors.black54
+                              : _sudokuElements[i].color.withOpacity(1);
+                        }
                       }
+
+                      _selectedIndex = index;
+
+                      setState(() {});
+
+                      // _sudokuElements[index].value = await showNumberPicker(
+                      //         context, _sudokuElements[index]) ??
+                      //     _sudokuElements[index].value;
+
+                      // setState(() {});
                     }
-
-                    // _sudokuElements[index].value = await showNumberPicker(
-                    //         context, _sudokuElements[index]) ??
-                    //     _sudokuElements[index].value;
-
-                    setState(() {});
                   },
                 ),
               ),
@@ -65,15 +77,17 @@ class _HomePageState extends State<HomePage> {
       );
 
   List<SudokuElementModel> generateRandomSudoku() {
-    final List<SudokuElementModel> elements = List<SudokuElementModel>.generate(
-      81,
-      (int index) => SudokuElementModel(
-        value: index % 9 + 1,
-        readonly: true,
-        color: Colors.red,
-        hints: <int>[0, 0, 0, 0, 0, 0],
-      ),
-    );
+    final List<SudokuElementModel> elements = <SudokuElementModel>[];
+
+    for (int i = 0; i < 9; i++) {
+      for (int j = 0; j < 9; j++) {
+        elements.add(SudokuElementModel(
+          value: board[i][j] == 0 ? 0 : board[i][j],
+          readonly: board[i][j] != 0,
+          color: board[i][j] == 0 ? Colors.grey : Colors.black54,
+        ));
+      }
+    }
 
     return elements;
   }
@@ -94,16 +108,14 @@ class _HomePageState extends State<HomePage> {
               children: <Widget>[
                 for (int i = 1; i <= 9; i++)
                   GestureDetector(
-                    child: Material(
-                      child: Text(
-                        '$i',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 24,
-                          color: sudokuElement.value == i
-                              ? Colors.black
-                              : Colors.grey,
-                        ),
+                    child: Text(
+                      '$i',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 24,
+                        color: sudokuElement.value == i
+                            ? Colors.black
+                            : Colors.grey,
                       ),
                     ),
                     onTap: () => Navigator.of(context).pop(i),
@@ -114,3 +126,15 @@ class _HomePageState extends State<HomePage> {
         ),
       );
 }
+
+final List<List<int>> board = <List<int>>[
+  <int>[7, 0, 2, 0, 5, 0, 6, 0, 0],
+  <int>[0, 0, 0, 0, 0, 3, 0, 0, 0],
+  <int>[1, 0, 0, 0, 0, 9, 5, 0, 0],
+  <int>[8, 0, 0, 0, 0, 0, 0, 9, 0],
+  <int>[0, 4, 3, 0, 0, 0, 7, 5, 0],
+  <int>[0, 9, 0, 0, 0, 0, 0, 0, 8],
+  <int>[0, 0, 9, 7, 0, 0, 0, 0, 5],
+  <int>[0, 0, 0, 2, 0, 0, 0, 0, 0],
+  <int>[0, 0, 7, 0, 4, 0, 2, 0, 3]
+];
