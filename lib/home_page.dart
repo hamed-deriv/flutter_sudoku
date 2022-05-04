@@ -16,9 +16,9 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  static const Color _color = Colors.grey;
-  static const Color _selectedColor = Colors.blueAccent;
-  static const Color _readonlyColor = Colors.black54;
+  final Color _color = Colors.white;
+  final Color _selectedColor = Colors.green.shade400;
+  final Color _selectedRowColBoxColor = Colors.green.shade100;
 
   late final List<SudokuElementModel> _sudokuElements;
 
@@ -28,21 +28,21 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
 
-    _sudokuElements =
-        generateRandomSudoku(boardBlueprint, _color, _readonlyColor);
+    _sudokuElements = generateRandomSudoku(boardBlueprint, _color);
 
     highlightRowColBox(
       _sudokuElements,
       _selectedIndex,
       _color,
       _selectedColor,
-      _readonlyColor,
+      _selectedRowColBoxColor,
     );
   }
 
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(elevation: 0, title: Text(widget.title)),
+        backgroundColor: Colors.blueGrey,
         body: Column(
           children: <Widget>[
             Padding(
@@ -73,7 +73,7 @@ class _HomePageState extends State<HomePage> {
                   index,
                   _color,
                   _selectedColor,
-                  _readonlyColor,
+                  _selectedRowColBoxColor,
                 );
 
                 _selectedIndex = index;
@@ -112,7 +112,7 @@ class _HomePageState extends State<HomePage> {
               fontSize: 30,
               color: _sudokuElements[_selectedIndex].value == number
                   ? Colors.black
-                  : Colors.grey,
+                  : Colors.white,
             ),
           ),
           style: TextButton.styleFrom(
@@ -158,7 +158,7 @@ class _HomePageState extends State<HomePage> {
       _selectedIndex,
       _color,
       _selectedColor,
-      _readonlyColor,
+      _selectedRowColBoxColor,
     );
   }
 }

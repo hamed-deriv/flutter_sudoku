@@ -31,18 +31,16 @@ void highlightRowColBox(
   List<SudokuElementModel> board,
   int index,
   Color color,
-  Color selectedColor,
-  Color readonlyColor,
+  Color selectedItemColor,
+  Color selectedRowColBoxColor,
 ) {
   for (int i = 0; i < board.length; i++) {
     if (i == index) {
-      board[i].color = selectedColor;
+      board[i].color = selectedItemColor;
     } else if (isInSameRowColumnBox(index, i)) {
-      board[i].color =
-          (board[i].readonly ? readonlyColor : color).withOpacity(0.6);
+      board[i].color = selectedRowColBoxColor;
     } else {
-      board[i].color =
-          (board[i].readonly ? readonlyColor : color).withOpacity(1);
+      board[i].color = color;
     }
   }
 }

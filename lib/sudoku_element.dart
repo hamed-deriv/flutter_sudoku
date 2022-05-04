@@ -18,11 +18,6 @@ class SudokuElement extends StatelessWidget {
             alignment: Alignment.center,
             children: <Widget>[
               buildValue(model.value),
-              buildHint(model.value, model.hints[0], Alignment.center),
-              buildHint(model.value, model.hints[1], Alignment.topLeft),
-              buildHint(model.value, model.hints[2], Alignment.topRight),
-              buildHint(model.value, model.hints[3], Alignment.bottomLeft),
-              buildHint(model.value, model.hints[4], Alignment.bottomRight),
             ],
           ),
         ),
@@ -42,29 +37,30 @@ class SudokuElement extends StatelessWidget {
             child: Text(
               '${model.value}',
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 32,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
+                fontWeight: FontWeight.normal,
+                color:
+                    model.readonly ? model.readonlyTextColor : model.textColor,
               ),
             ),
           ),
         );
 
-  Widget buildHint(int value, int hintValue, Alignment align) =>
-      value == 0 && hintValue != 0
-          ? Positioned.fill(
-              child: Align(
-                alignment: align,
-                child: Text(
-                  '$value',
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            )
-          : const SizedBox.shrink();
+  // Widget _buildHint(int value, int hintValue, Alignment align) =>
+  //     value == 0 && hintValue != 0
+  //         ? Positioned.fill(
+  //             child: Align(
+  //               alignment: align,
+  //               child: Text(
+  //                 '$value',
+  //                 textAlign: TextAlign.center,
+  //                 style: const TextStyle(
+  //                   fontSize: 12,
+  //                   color: Colors.white,
+  //                 ),
+  //               ),
+  //             ),
+  //           )
+  //         : const SizedBox.shrink();
 }
