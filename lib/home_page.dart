@@ -4,6 +4,7 @@ import 'package:flutter_sudoku/helpers.dart';
 
 import 'package:flutter_sudoku/sudoku_element.dart';
 import 'package:flutter_sudoku/sudoku_element_model.dart';
+import 'package:flutter_sudoku/sudoku_generator.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({required this.title, Key? key}) : super(key: key);
@@ -15,6 +16,10 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  static const Color _color = Colors.grey;
+  static const Color _selectedColor = Colors.blueAccent;
+  static const Color _readonlyColor = Colors.black54;
+
   late final List<SudokuElementModel> _sudokuElements;
 
   int _selectedIndex = 0;
@@ -23,118 +28,137 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
 
-    _sudokuElements = generateRandomSudoku();
+    _sudokuElements =
+        generateRandomSudoku(boardBlueprint, _color, _readonlyColor);
+
+    highlightRowColBox(
+      _sudokuElements,
+      _selectedIndex,
+      _color,
+      _selectedColor,
+      _readonlyColor,
+    );
   }
 
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(elevation: 0, title: Text(widget.title)),
-        body: Padding(
-          padding: const EdgeInsets.all(8),
-          child: GridView.builder(
-            itemCount: 81,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 9,
+        body: Column(
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.all(8),
+              child: _buildBoard(),
             ),
-            itemBuilder: (BuildContext context, int index) => Padding(
-              padding: EdgeInsets.only(
-                top: get2dCoordinates(index)[0] % 3 == 0 ? 4 : 1,
-                left: get2dCoordinates(index)[1] % 3 == 0 ? 4 : 1,
-              ),
-              child: Material(
-                child: InkWell(
-                  child: SudokuElement(model: _sudokuElements[index]),
-                  onTap: () async {
-                    if (!_sudokuElements[index].readonly) {
-                      for (int i = 0; i < 81; i++) {
-                        if (isInSameRowColumnBox(index, i)) {
-                          _sudokuElements[i].color = _sudokuElements[i].readonly
-                              ? Colors.black54
-                              : _sudokuElements[i].color.withOpacity(0.6);
-                        } else {
-                          _sudokuElements[i].color = _sudokuElements[i].readonly
-                              ? Colors.black54
-                              : _sudokuElements[i].color.withOpacity(1);
-                        }
-                      }
-
-                      _selectedIndex = index;
-
-                      setState(() {});
-
-                      // _sudokuElements[index].value = await showNumberPicker(
-                      //         context, _sudokuElements[index]) ??
-                      //     _sudokuElements[index].value;
-
-                      // setState(() {});
-                    }
-                  },
-                ),
-              ),
-            ),
-          ),
+            _buildInputNumbers(),
+          ],
         ),
       );
 
-  List<SudokuElementModel> generateRandomSudoku() {
-    final List<SudokuElementModel> elements = <SudokuElementModel>[];
+  Widget _buildBoard() => GridView.builder(
+        shrinkWrap: true,
+        itemCount: _sudokuElements.length,
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 9,
+        ),
+        itemBuilder: (BuildContext context, int index) => Padding(
+          padding: EdgeInsets.only(
+            top: get2dCoordinates(index)[0] % 3 == 0 ? 4 : 1,
+            left: get2dCoordinates(index)[1] % 3 == 0 ? 4 : 1,
+          ),
+          child: SudokuElement(
+              model: _sudokuElements[index],
+              onPressed: () {
+                highlightRowColBox(
+                  _sudokuElements,
+                  index,
+                  _color,
+                  _selectedColor,
+                  _readonlyColor,
+                );
 
-    for (int i = 0; i < 9; i++) {
-      for (int j = 0; j < 9; j++) {
-        elements.add(SudokuElementModel(
-          value: board[i][j] == 0 ? 0 : board[i][j],
-          readonly: board[i][j] != 0,
-          color: board[i][j] == 0 ? Colors.grey : Colors.black54,
-        ));
-      }
-    }
+                _selectedIndex = index;
 
-    return elements;
+                setState(() {});
+              }),
+        ),
+      );
+
+  Widget _buildInputNumbers() => Padding(
+        padding: const EdgeInsets.all(8),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: <Widget>[
+            _buildInputNumber(1),
+            _buildInputNumber(2),
+            _buildInputNumber(3),
+            _buildInputNumber(4),
+            _buildInputNumber(5),
+            _buildInputNumber(6),
+            _buildInputNumber(7),
+            _buildInputNumber(8),
+            _buildInputNumber(9),
+            _buildClearButton(),
+          ],
+        ),
+      );
+
+  Widget _buildInputNumber(int number) => SizedBox(
+        width: 48,
+        height: 48,
+        child: TextButton(
+          child: Text(
+            '$number',
+            style: TextStyle(
+              fontSize: 30,
+              color: _sudokuElements[_selectedIndex].value == number
+                  ? Colors.black
+                  : Colors.grey,
+            ),
+          ),
+          style: TextButton.styleFrom(
+            minimumSize: Size.zero,
+            padding: EdgeInsets.zero,
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          ),
+          onPressed: () {
+            if (!_sudokuElements[_selectedIndex].readonly) {
+              _setValue(number);
+
+              setState(() {});
+            }
+          },
+        ),
+      );
+
+  Widget _buildClearButton() => SizedBox(
+        width: 48,
+        height: 48,
+        child: TextButton(
+          child: const Icon(Icons.delete, color: Colors.black),
+          style: TextButton.styleFrom(
+            minimumSize: Size.zero,
+            padding: EdgeInsets.zero,
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          ),
+          onPressed: () {
+            if (!_sudokuElements[_selectedIndex].readonly) {
+              _setValue(0);
+
+              setState(() {});
+            }
+          },
+        ),
+      );
+
+  void _setValue(int number) {
+    _sudokuElements[_selectedIndex].value = number;
+
+    highlightRowColBox(
+      _sudokuElements,
+      _selectedIndex,
+      _color,
+      _selectedColor,
+      _readonlyColor,
+    );
   }
-
-  Future<int?> showNumberPicker(
-    BuildContext context,
-    SudokuElementModel sudokuElement,
-  ) async =>
-      showDialog<int?>(
-        context: context,
-        builder: (BuildContext context) => AlertDialog(
-          title: const Text('Pick a number'),
-          content: Container(
-            width: 180,
-            height: 180,
-            child: GridView.count(
-              crossAxisCount: 3,
-              children: <Widget>[
-                for (int i = 1; i <= 9; i++)
-                  GestureDetector(
-                    child: Text(
-                      '$i',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 24,
-                        color: sudokuElement.value == i
-                            ? Colors.black
-                            : Colors.grey,
-                      ),
-                    ),
-                    onTap: () => Navigator.of(context).pop(i),
-                  ),
-              ],
-            ),
-          ),
-        ),
-      );
 }
-
-final List<List<int>> board = <List<int>>[
-  <int>[7, 0, 2, 0, 5, 0, 6, 0, 0],
-  <int>[0, 0, 0, 0, 0, 3, 0, 0, 0],
-  <int>[1, 0, 0, 0, 0, 9, 5, 0, 0],
-  <int>[8, 0, 0, 0, 0, 0, 0, 9, 0],
-  <int>[0, 4, 3, 0, 0, 0, 7, 5, 0],
-  <int>[0, 9, 0, 0, 0, 0, 0, 0, 8],
-  <int>[0, 0, 9, 7, 0, 0, 0, 0, 5],
-  <int>[0, 0, 0, 2, 0, 0, 0, 0, 0],
-  <int>[0, 0, 7, 0, 4, 0, 2, 0, 3]
-];
