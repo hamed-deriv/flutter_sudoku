@@ -16,6 +16,8 @@ final List<List<int>> boardBlueprint = <List<int>>[
 List<SudokuElementModel> generateRandomSudoku(
   List<List<int>> boardBlueprint,
   Color color,
+  Color textColor,
+  Color readonlyTextColor,
 ) {
   final List<SudokuElementModel> board = <SudokuElementModel>[];
 
@@ -27,6 +29,9 @@ List<SudokuElementModel> generateRandomSudoku(
         SudokuElementModel(
           value: isEmpty ? 0 : boardBlueprint[i][j],
           readonly: !isEmpty,
+          color: color,
+          textColor: textColor,
+          readonlyTextColor: readonlyTextColor,
         ),
       );
     }

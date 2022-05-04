@@ -44,3 +44,18 @@ void highlightRowColBox(
     }
   }
 }
+
+void highlightNumbers(
+  List<SudokuElementModel> board,
+  int number,
+  Color color,
+  Color numberColor,
+) {
+  for (int i = 0; i < board.length; i++) {
+    if (board[i].value == number) {
+      board[i].textColor = numberColor;
+    } else {
+      board[i].textColor = color;
+    }
+  }
+}

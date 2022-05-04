@@ -17,6 +17,9 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final Color _color = Colors.white;
+  final Color _textColor = Colors.black;
+  final Color _readonlyTextColor = Colors.grey;
+
   final Color _selectedColor = Colors.green.shade400;
   final Color _selectedRowColBoxColor = Colors.green.shade100;
 
@@ -28,15 +31,14 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
 
-    _sudokuElements = generateRandomSudoku(boardBlueprint, _color);
-
-    highlightRowColBox(
-      _sudokuElements,
-      _selectedIndex,
+    _sudokuElements = generateRandomSudoku(
+      boardBlueprint,
       _color,
-      _selectedColor,
-      _selectedRowColBoxColor,
+      _textColor,
+      _readonlyTextColor,
     );
+
+    _setValue(_sudokuElements[_selectedIndex].value);
   }
 
   @override
@@ -68,17 +70,9 @@ class _HomePageState extends State<HomePage> {
           child: SudokuElement(
               model: _sudokuElements[index],
               onPressed: () {
-                highlightRowColBox(
-                  _sudokuElements,
-                  index,
-                  _color,
-                  _selectedColor,
-                  _selectedRowColBoxColor,
-                );
-
                 _selectedIndex = index;
 
-                setState(() {});
+                _setValue(_sudokuElements[_selectedIndex].value);
               }),
         ),
       );
@@ -123,8 +117,6 @@ class _HomePageState extends State<HomePage> {
           onPressed: () {
             if (!_sudokuElements[_selectedIndex].readonly) {
               _setValue(number);
-
-              setState(() {});
             }
           },
         ),
@@ -143,8 +135,6 @@ class _HomePageState extends State<HomePage> {
           onPressed: () {
             if (!_sudokuElements[_selectedIndex].readonly) {
               _setValue(0);
-
-              setState(() {});
             }
           },
         ),
@@ -160,5 +150,9 @@ class _HomePageState extends State<HomePage> {
       _selectedColor,
       _selectedRowColBoxColor,
     );
+
+    highlightNumbers(_sudokuElements, number, Colors.red, Colors.red);
+
+    setState(() {});
   }
 }
