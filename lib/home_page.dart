@@ -17,10 +17,13 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final Color _color = Colors.white;
+
   final Color _textColor = Colors.black;
+  final Color _invalidTextColor = Colors.red;
   final Color _readonlyTextColor = Colors.grey;
 
-  final Color _selectedColor = Colors.green.shade400;
+  final Color _selectedColor = Colors.green.shade300;
+  final Color _sameValueColor = Colors.green.shade400;
   final Color _selectedRowColBoxColor = Colors.green.shade100;
 
   late final List<SudokuElementModel> _sudokuElements;
@@ -43,7 +46,14 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(elevation: 0, title: Text(widget.title)),
+        appBar: AppBar(
+          elevation: 0,
+          centerTitle: true,
+          title: Text(
+            widget.title,
+            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
+        ),
         backgroundColor: Colors.blueGrey,
         body: Column(
           children: <Widget>[
@@ -70,6 +80,10 @@ class _HomePageState extends State<HomePage> {
           child: SudokuElement(
               model: _sudokuElements[index],
               onPressed: () {
+                if (_selectedIndex == index) {
+                  return;
+                }
+
                 _selectedIndex = index;
 
                 _setValue(_sudokuElements[_selectedIndex].value);
@@ -97,8 +111,8 @@ class _HomePageState extends State<HomePage> {
       );
 
   Widget _buildInputNumber(int number) => SizedBox(
-        width: 48,
-        height: 48,
+        width: 32,
+        height: 32,
         child: TextButton(
           child: Text(
             '$number',
@@ -114,44 +128,46 @@ class _HomePageState extends State<HomePage> {
             padding: EdgeInsets.zero,
             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
           ),
-          onPressed: () {
-            if (!_sudokuElements[_selectedIndex].readonly) {
-              _setValue(number);
-            }
-          },
+          onPressed: () => _setValue(number),
         ),
       );
 
   Widget _buildClearButton() => SizedBox(
-        width: 48,
-        height: 48,
+        width: 32,
+        height: 32,
         child: TextButton(
-          child: const Icon(Icons.delete, color: Colors.black),
+          child: const Icon(Icons.delete, color: Colors.white),
           style: TextButton.styleFrom(
             minimumSize: Size.zero,
             padding: EdgeInsets.zero,
             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
           ),
-          onPressed: () {
-            if (!_sudokuElements[_selectedIndex].readonly) {
-              _setValue(0);
-            }
-          },
+          onPressed: () => _setValue(0),
         ),
       );
 
   void _setValue(int number) {
-    _sudokuElements[_selectedIndex].value = number;
+    _sudokuElements[_selectedIndex].value =
+        _sudokuElements[_selectedIndex].readonly
+            ? _sudokuElements[_selectedIndex].value
+            : number;
 
     highlightRowColBox(
       _sudokuElements,
       _selectedIndex,
       _color,
       _selectedColor,
+      _sameValueColor,
       _selectedRowColBoxColor,
     );
 
-    highlightNumbers(_sudokuElements, number, Colors.red, Colors.red);
+    // highlightInvalidEntry(
+    //   _sudokuElements,
+    //   _solution,
+    //   _selectedIndex,
+    //   _textColor,
+    //   _invalidTextColor,
+    // );
 
     setState(() {});
   }

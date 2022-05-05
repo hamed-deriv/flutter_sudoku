@@ -32,6 +32,7 @@ void highlightRowColBox(
   int index,
   Color color,
   Color selectedItemColor,
+  Color sameValueColor,
   Color selectedRowColBoxColor,
 ) {
   for (int i = 0; i < board.length; i++) {
@@ -39,23 +40,26 @@ void highlightRowColBox(
       board[i].color = selectedItemColor;
     } else if (isInSameRowColumnBox(index, i)) {
       board[i].color = selectedRowColBoxColor;
+    } else if (board[i].value == board[index].value && board[i].value != 0) {
+      board[i].color = sameValueColor;
     } else {
       board[i].color = color;
     }
   }
 }
 
-void highlightNumbers(
+void highlightInvalidEntry(
   List<SudokuElementModel> board,
-  int number,
-  Color color,
-  Color numberColor,
+  List<List<int>> solvedBoard,
+  int index,
+  Color textColor,
+  Color invalidTextColor,
 ) {
-  for (int i = 0; i < board.length; i++) {
-    if (board[i].value == number) {
-      board[i].textColor = numberColor;
-    } else {
-      board[i].textColor = color;
-    }
+  final List<int> coordinates = get2dCoordinates(index);
+
+  if (solvedBoard[coordinates[0]][coordinates[1]] == board[index].value) {
+    board[index].textColor = invalidTextColor;
+  } else {
+    board[index].textColor = textColor;
   }
 }
