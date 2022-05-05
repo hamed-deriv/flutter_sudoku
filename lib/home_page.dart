@@ -5,6 +5,7 @@ import 'package:flutter_sudoku/helpers.dart';
 import 'package:flutter_sudoku/sudoku_element.dart';
 import 'package:flutter_sudoku/sudoku_element_model.dart';
 import 'package:flutter_sudoku/sudoku_generator.dart';
+import 'package:flutter_sudoku/sudoku_solver.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({required this.title, Key? key}) : super(key: key);
@@ -27,6 +28,7 @@ class _HomePageState extends State<HomePage> {
   final Color _selectedRowColBoxColor = Colors.green.shade100;
 
   late final List<SudokuElementModel> _sudokuElements;
+  late final List<List<int>> _solution;
 
   int _selectedIndex = 0;
 
@@ -40,6 +42,8 @@ class _HomePageState extends State<HomePage> {
       _textColor,
       _readonlyTextColor,
     );
+
+    _solution = (SudokuSolver()..solve(boardBlueprint)).board;
 
     _setValue(_sudokuElements[_selectedIndex].value);
   }
@@ -161,13 +165,13 @@ class _HomePageState extends State<HomePage> {
       _selectedRowColBoxColor,
     );
 
-    // highlightInvalidEntry(
-    //   _sudokuElements,
-    //   _solution,
-    //   _selectedIndex,
-    //   _textColor,
-    //   _invalidTextColor,
-    // );
+    highlightInvalidEntry(
+      _sudokuElements,
+      _solution,
+      _selectedIndex,
+      _textColor,
+      _invalidTextColor,
+    );
 
     setState(() {});
   }

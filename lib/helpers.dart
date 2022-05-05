@@ -56,10 +56,8 @@ void highlightInvalidEntry(
   Color invalidTextColor,
 ) {
   final List<int> coordinates = get2dCoordinates(index);
+  final int solvedBoardValue = solvedBoard[coordinates[0]][coordinates[1]];
 
-  if (solvedBoard[coordinates[0]][coordinates[1]] == board[index].value) {
-    board[index].textColor = invalidTextColor;
-  } else {
-    board[index].textColor = textColor;
-  }
+  board[index].textColor =
+      solvedBoardValue == board[index].value ? textColor : invalidTextColor;
 }
