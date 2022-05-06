@@ -157,20 +157,20 @@ class _HomePageState extends State<HomePage> {
             : number;
 
     highlightRowColBox(
-      _sudokuElements,
-      _selectedIndex,
-      _color,
-      _selectedColor,
-      _sameValueColor,
-      _selectedRowColBoxColor,
+      board: _sudokuElements,
+      index: _selectedIndex,
+      color: _color,
+      selectedColor: _selectedColor,
+      sameValueColor: _sameValueColor,
+      selectedRowColBoxColor: _selectedRowColBoxColor,
     );
 
     highlightInvalidEntry(
-      _sudokuElements,
-      _solution,
-      _selectedIndex,
-      _textColor,
-      _invalidTextColor,
+      board: _sudokuElements,
+      solvedBoard: _solution,
+      index: _selectedIndex,
+      textColor: _textColor,
+      invalidTextColor: _invalidTextColor,
     );
 
     setState(() {});
